@@ -31,7 +31,7 @@ import Activity from '../icons/activity.astro';
 
         <div class="flex gap-2 mt-3">
           <span class="text-[#10b981] select-none">$</span>
-          <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#a78bfa]">--subdomain</span> <span class="text-[#fbbf24]">demo</span></span>
+          <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#60a5fa]">--subdomain</span> <span class="text-[#fbbf24]">demo</span></span>
         </div>
         <div class="pl-4 whitespace-nowrap">
           <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://demo.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
@@ -39,28 +39,28 @@ import Activity from '../icons/activity.astro';
 
         <div class="flex gap-2 mt-3">
           <span class="text-[#10b981] select-none">$</span>
-          <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">8080</span> <span class="text-[#a78bfa]">--password</span> <span class="text-[#a78bfa]">--ttl</span> <span class="text-[#fbbf24]">30m</span></span>
+          <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">8080</span> <span class="text-[#60a5fa]">--password</span> <span class="text-[#60a5fa]">--ttl</span> <span class="text-[#fbbf24]">30m</span></span>
         </div>
         <div class="pl-4 whitespace-nowrap">
           <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://a1b2c3.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
         </div>
         <div class="pl-4 whitespace-nowrap">
-          <span class="text-[#737373]">&nbsp;</span> <span class="text-[#a78bfa]">password protected</span> <span class="text-[#525252]">&middot;</span> <span class="text-[#fbbf24]">expires in 30m</span>
+          <span class="text-[#737373]">&nbsp;</span> <span class="text-[#60a5fa]">password protected</span> <span class="text-[#525252]">&middot;</span> <span class="text-[#fbbf24]">expires in 30m</span>
         </div>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3 mt-5 max-sm:grid-cols-1">
-      <FeatureRow title="Vanity Subdomains" description="Choose your own subdomain on slim.show.">
+      <FeatureRow title="Vanity Subdomains" description="Choose your own subdomain on slim.show." tint="#fdf2f8">
         <Globe />
       </FeatureRow>
-      <FeatureRow title="Password Protected" description="Add authentication to your public URL.">
+      <FeatureRow title="Password Protected" description="Add authentication to your public URL." tint="#ecfdf5">
         <ShieldCheck />
       </FeatureRow>
-      <FeatureRow title="Auto-Expiring" description="Set a TTL so tunnels close automatically.">
+      <FeatureRow title="Auto-Expiring" description="Set a TTL so tunnels close automatically." tint="#f1f5f9">
         <Clock />
       </FeatureRow>
-      <FeatureRow title="Live Request Logs" description="Watch requests flow through in real-time.">
+      <FeatureRow title="Live Request Logs" description="Watch requests flow through in real-time." tint="#fffbeb">
         <Activity />
       </FeatureRow>
     </div>

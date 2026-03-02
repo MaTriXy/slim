@@ -5,10 +5,10 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
 ---
 
 <section class="relative py-14 text-left max-sm:py-9 overflow-hidden" id="install">
-  <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,_#f3f1ff_0%,_transparent_60%)] pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,_#e0f2fe_0%,_transparent_60%)] pointer-events-none" aria-hidden="true"></div>
 
   <div class="max-w-(--max-width) mx-auto px-(--padding-x) text-center relative">
-    <div class="inline-flex items-center gap-2 rounded-full border border-[#e5e3ff] bg-[#f3f2ff] px-3 py-1 text-[11.5px] font-medium text-primary mb-6">
+    <div class="inline-flex items-center gap-2 rounded-full border border-[#bfdbfe] bg-[#eff6ff] px-3 py-1 text-[11.5px] font-medium text-primary mb-6">
       <span class="size-1.5 rounded-full bg-primary"></span>
       Open Source · Built with Go
     </div>
@@ -44,7 +44,7 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
         <div class="px-4 pt-4 pb-5 font-mono text-[13px] leading-[1.7] text-code-text max-sm:text-[11.5px]">
           <div class="flex gap-2">
             <span class="text-[#10b981] select-none">$</span>
-            <span><span class="text-[#7dd3fc]">slim</span> start web <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
+            <span><span class="text-[#7dd3fc]">slim</span> start web <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
             <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://web.local</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
@@ -52,7 +52,7 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
 
           <div class="flex gap-2 mt-3">
             <span class="text-[#10b981] select-none">$</span>
-            <span><span class="text-[#7dd3fc]">slim</span> start myapp <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#a78bfa]">--route</span> <span class="text-[#fbbf24]">/api=8080</span></span>
+            <span><span class="text-[#7dd3fc]">slim</span> start myapp <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#60a5fa]">--route</span> <span class="text-[#fbbf24]">/api=8080</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
             <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://myapp.local</span> &nbsp;&nbsp;&nbsp;<span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
@@ -81,7 +81,7 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
         <div class="px-4 pt-4 pb-5 font-mono text-[13px] leading-[1.7] text-code-text max-sm:text-[11.5px]">
           <div class="flex gap-2">
             <span class="text-[#10b981] select-none">$</span>
-            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
             <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://r4nd0m.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
@@ -89,7 +89,7 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
 
           <div class="flex gap-2 mt-3">
             <span class="text-[#10b981] select-none">$</span>
-            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#a78bfa]">--subdomain</span> <span class="text-[#fbbf24]">demo</span></span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">3000</span> <span class="text-[#60a5fa]">--subdomain</span> <span class="text-[#fbbf24]">demo</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
             <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://demo.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:3000</span>
@@ -97,18 +97,18 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
 
           <div class="flex gap-2 mt-3">
             <span class="text-[#10b981] select-none">$</span>
-            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">8080</span> <span class="text-[#a78bfa]">--password</span> <span class="text-[#a78bfa]">--ttl</span> <span class="text-[#fbbf24]">30m</span></span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">8080</span> <span class="text-[#60a5fa]">--password</span> <span class="text-[#60a5fa]">--ttl</span> <span class="text-[#fbbf24]">30m</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
             <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://a1b2c3.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:8080</span>
           </div>
           <div class="pl-4 whitespace-nowrap">
-            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#a78bfa]">password protected</span> <span class="text-[#525252]">&middot;</span> <span class="text-[#fbbf24]">expires in 30m</span>
+            <span class="text-[#737373]">&nbsp;</span> <span class="text-[#60a5fa]">password protected</span> <span class="text-[#525252]">&middot;</span> <span class="text-[#fbbf24]">expires in 30m</span>
           </div>
 
           <div class="flex gap-2 mt-3">
             <span class="text-[#10b981] select-none">$</span>
-            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#a78bfa]">--port</span> <span class="text-[#fbbf24]">4321</span> <span class="text-[#a78bfa]">--subdomain</span> <span class="text-[#fbbf24]">staging</span> <span class="text-[#a78bfa]">--ttl</span> <span class="text-[#fbbf24]">2h</span></span>
+            <span><span class="text-[#7dd3fc]">slim</span> share <span class="text-[#60a5fa]">--port</span> <span class="text-[#fbbf24]">4321</span> <span class="text-[#60a5fa]">--subdomain</span> <span class="text-[#fbbf24]">staging</span> <span class="text-[#60a5fa]">--ttl</span> <span class="text-[#fbbf24]">2h</span></span>
           </div>
           <div class="pl-4 whitespace-nowrap">
             <span class="text-[#34d399]">&#10003;</span> <span class="text-[#34d399] font-medium">https://staging.slim.show</span> <span class="text-[#525252]">&rarr;</span> <span class="text-[#737373]">localhost:4321</span>
@@ -124,7 +124,7 @@ const installCmd = 'curl -sL https://slim.sh/install.sh | sh';
       <p class="text-[13px] text-text font-medium mb-2">Install with one command</p>
       <div class="bg-code-bg rounded-lg px-4 py-2.5 flex items-center gap-3 overflow-x-auto">
         <code class="font-mono text-[12.5px] text-[#a3a3a3] whitespace-nowrap flex-1">
-          <span class="text-[#10b981] mr-1.5">$</span> <span class="text-[#7dd3fc]">curl</span> <span class="text-[#a78bfa]">-sL</span> <span class="text-[#34d399]">https://slim.sh/install.sh</span> | <span class="text-[#7dd3fc]">sh</span>
+          <span class="text-[#10b981] mr-1.5">$</span> <span class="text-[#7dd3fc]">curl</span> <span class="text-[#60a5fa]">-sL</span> <span class="text-[#34d399]">https://slim.sh/install.sh</span> | <span class="text-[#7dd3fc]">sh</span>
         </code>
         <CopyButton text={installCmd} />
       </div>
