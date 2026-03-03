@@ -82,10 +82,13 @@ var shareCmd = &cobra.Command{
 			return fmt.Errorf("tunnel connection failed: %w", err)
 		}
 
+		arrow := term.Dim.Render("→")
+		target := term.Dim.Render(fmt.Sprintf("localhost:%d", port))
+
 		fmt.Println()
-		fmt.Printf("  %s → localhost:%d\n", url, port)
+		fmt.Printf("  %s %s  %s  %s\n", term.CheckMark, term.Green.Render(url), arrow, target)
 		if domainURL := client.DomainURL(); domainURL != "" {
-			fmt.Printf("  %s → localhost:%d\n", domainURL, port)
+			fmt.Printf("  %s %s  %s  %s\n", term.CheckMark, term.Green.Render(domainURL), arrow, target)
 		}
 		if password != "" {
 			fmt.Printf("  Password: %s\n", password)

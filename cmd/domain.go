@@ -14,6 +14,7 @@ import (
 	"github.com/kamranahmedse/slim/internal/auth"
 	"github.com/kamranahmedse/slim/internal/config"
 	"github.com/kamranahmedse/slim/internal/log"
+	"github.com/kamranahmedse/slim/internal/term"
 	"github.com/spf13/cobra"
 )
 
@@ -43,48 +44,63 @@ var domainAddCmd = &cobra.Command{
 			return err
 		}
 
-		body, err := json.Marshal(map[string]string{"domain": domain})
+		var targetIP string
+		fmt.Println()
+		err = term.RunSteps([]term.Step{
+			{
+				Name: fmt.Sprintf("Adding domain %s", domain),
+				Run: func() (string, error) {
+					body, err := json.Marshal(map[string]string{"domain": domain})
+					if err != nil {
+						return "", fmt.Errorf("encoding request: %w", err)
+					}
+
+					client := &http.Client{Timeout: 10 * time.Second}
+					req, err := http.NewRequest("POST", config.APIBaseURL()+"/api/domains", bytes.NewReader(body))
+					if err != nil {
+						return "", fmt.Errorf("creating request: %w", err)
+					}
+					req.Header.Set("Authorization", "Bearer "+info.Token)
+					req.Header.Set("Content-Type", "application/json")
+
+					resp, err := client.Do(req)
+					if err != nil {
+						return "", fmt.Errorf("adding domain: %w", err)
+					}
+					defer resp.Body.Close()
+
+					if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+						return "", apiError(resp, "failed to add domain")
+					}
+
+					var result struct {
+						Domain   domainEntry `json:"domain"`
+						TargetIP string      `json:"target_ip"`
+					}
+					if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+						return "", fmt.Errorf("decoding response: %w", err)
+					}
+
+					targetIP = result.TargetIP
+					if targetIP == "" {
+						targetIP = result.Domain.TargetIP
+					}
+
+					return "done", nil
+				},
+			},
+		})
 		if err != nil {
-			return fmt.Errorf("encoding request: %w", err)
+			return err
 		}
 
-		client := &http.Client{Timeout: 10 * time.Second}
-		req, err := http.NewRequest("POST", config.APIBaseURL()+"/api/domains", bytes.NewReader(body))
-		if err != nil {
-			return fmt.Errorf("creating request: %w", err)
-		}
-		req.Header.Set("Authorization", "Bearer "+info.Token)
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := client.Do(req)
-		if err != nil {
-			return fmt.Errorf("adding domain: %w", err)
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-			return apiError(resp, "failed to add domain")
-		}
-
-		var result struct {
-			Domain   domainEntry `json:"domain"`
-			TargetIP string     `json:"target_ip"`
-		}
-		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return fmt.Errorf("decoding response: %w", err)
-		}
-
-		targetIP := result.TargetIP
-		if targetIP == "" {
-			targetIP = result.Domain.TargetIP
-		}
-
-		fmt.Printf("\nDomain %s added.\n\n", domain)
-		fmt.Printf("Add the following DNS record to verify ownership:\n\n")
-		fmt.Printf("  Type:  A\n")
-		fmt.Printf("  Name:  %s\n", domain)
-		fmt.Printf("  Value: %s\n\n", targetIP)
-		fmt.Printf("Then run: slim domain verify %s\n\n", domain)
+		fmt.Printf("\n  Add the following DNS record to verify ownership:\n\n")
+		fmt.Printf("    Type:  %s\n", term.Bold.Render("A"))
+		fmt.Printf("    Name:  %s\n", term.Bold.Render(domain))
+		fmt.Printf("    Value: %s\n\n", term.Bold.Render(targetIP))
+		fmt.Printf("  %s If using Cloudflare, disable the proxy (grey cloud / DNS only).\n", term.Dim.Render("*"))
+		fmt.Printf("  %s DNS changes can take a few minutes to propagate.\n\n", term.Dim.Render("*"))
+		fmt.Printf("  Then run: %s\n\n", term.Cyan.Render("slim domain verify "+domain))
 
 		return nil
 	},
@@ -100,21 +116,34 @@ var domainListCmd = &cobra.Command{
 			return err
 		}
 
-		domains, err := fetchDomains(info.Token)
+		var domains []domainEntry
+		fmt.Println()
+		err = term.RunSteps([]term.Step{
+			{
+				Name: "Fetching domains",
+				Run: func() (string, error) {
+					domains, err = fetchDomains(info.Token)
+					if err != nil {
+						return "", err
+					}
+					return "done", nil
+				},
+			},
+		})
 		if err != nil {
 			return err
 		}
 
 		if len(domains) == 0 {
-			fmt.Println("No custom domains. Use 'slim domain add <domain>' to add one.")
+			fmt.Println("\n  No custom domains. Use 'slim domain add <domain>' to add one.")
 			return nil
 		}
 
 		var rows [][]string
 		for _, d := range domains {
-			status := "pending"
+			status := term.Yellow.Render("● pending")
 			if d.Verified {
-				status = "verified"
+				status = term.Green.Render("● verified")
 			}
 			added := d.CreatedAt
 			if t, err := time.Parse(time.RFC3339, d.CreatedAt); err == nil {
@@ -157,41 +186,60 @@ var domainVerifyCmd = &cobra.Command{
 			return err
 		}
 
-		domains, err := fetchDomains(info.Token)
-		if err != nil {
-			return err
-		}
+		fmt.Println()
+		return term.RunSteps([]term.Step{
+			{
+				Name: "Looking up domain",
+				Run: func() (string, error) {
+					domains, err := fetchDomains(info.Token)
+					if err != nil {
+						return "", err
+					}
+					domainID := findDomainID(domains, domain)
+					if domainID == "" {
+						return "", fmt.Errorf("domain %s not found — use 'slim domain add' first", domain)
+					}
+					return domainID, nil
+				},
+			},
+			{
+				Name: fmt.Sprintf("Verifying DNS for %s", domain),
+				Run: func() (string, error) {
+					domains, err := fetchDomains(info.Token)
+					if err != nil {
+						return "", err
+					}
+					domainID := findDomainID(domains, domain)
+					if domainID == "" {
+						return "", fmt.Errorf("domain %s not found", domain)
+					}
 
-		domainID := findDomainID(domains, domain)
-		if domainID == "" {
-			return fmt.Errorf("domain %s not found — use 'slim domain add' first", domain)
-		}
+					client := &http.Client{Timeout: 10 * time.Second}
+					req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/domains/%s/verify", config.APIBaseURL(), domainID), nil)
+					if err != nil {
+						return "", fmt.Errorf("creating request: %w", err)
+					}
+					req.Header.Set("Authorization", "Bearer "+info.Token)
 
-		client := &http.Client{Timeout: 10 * time.Second}
-		req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/domains/%s/verify", config.APIBaseURL(), domainID), nil)
-		if err != nil {
-			return fmt.Errorf("creating request: %w", err)
-		}
-		req.Header.Set("Authorization", "Bearer "+info.Token)
+					resp, err := client.Do(req)
+					if err != nil {
+						return "", fmt.Errorf("verifying domain: %w", err)
+					}
+					defer resp.Body.Close()
 
-		resp, err := client.Do(req)
-		if err != nil {
-			return fmt.Errorf("verifying domain: %w", err)
-		}
-		defer resp.Body.Close()
+					if resp.StatusCode != http.StatusOK {
+						bodyBytes, _ := io.ReadAll(resp.Body)
+						msg := strings.TrimSpace(string(bodyBytes))
+						if msg == "" {
+							msg = resp.Status
+						}
+						return "", fmt.Errorf("%s", msg)
+					}
 
-		if resp.StatusCode != http.StatusOK {
-			bodyBytes, _ := io.ReadAll(resp.Body)
-			msg := strings.TrimSpace(string(bodyBytes))
-			if msg == "" {
-				msg = resp.Status
-			}
-			return fmt.Errorf("verification failed: %s", msg)
-		}
-
-		fmt.Printf("Domain %s verified successfully.\n", domain)
-
-		return nil
+					return "done", nil
+				},
+			},
+		})
 	},
 }
 
@@ -207,35 +255,63 @@ var domainRemoveCmd = &cobra.Command{
 			return err
 		}
 
-		domains, err := fetchDomains(info.Token)
-		if err != nil {
-			return err
-		}
+		fmt.Println()
+		return term.RunSteps([]term.Step{
+			{
+				Name: fmt.Sprintf("Removing domain %s", domain),
+				Run: func() (string, error) {
+					domains, err := fetchDomains(info.Token)
+					if err != nil {
+						return "", err
+					}
 
-		domainID := findDomainID(domains, domain)
-		if domainID == "" {
-			return fmt.Errorf("domain %s not found", domain)
-		}
+					domainID := findDomainID(domains, domain)
+					if domainID == "" {
+						return "", fmt.Errorf("domain %s not found", domain)
+					}
 
-		client := &http.Client{Timeout: 10 * time.Second}
-		req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/api/domains/%s", config.APIBaseURL(), domainID), nil)
-		if err != nil {
-			return fmt.Errorf("creating request: %w", err)
-		}
-		req.Header.Set("Authorization", "Bearer "+info.Token)
+					deleteURL := fmt.Sprintf("%s/api/domains/%s", config.APIBaseURL(), domainID)
 
-		resp, err := client.Do(req)
-		if err != nil {
-			return fmt.Errorf("removing domain: %w", err)
-		}
-		defer resp.Body.Close()
+					client := &http.Client{Timeout: 10 * time.Second}
+					req, err := http.NewRequest("DELETE", deleteURL, nil)
+					if err != nil {
+						return "", fmt.Errorf("creating request: %w", err)
+					}
+					req.Header.Set("Authorization", "Bearer "+info.Token)
 
-		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-			return apiError(resp, "failed to remove domain")
-		}
+					resp, err := client.Do(req)
+					if err != nil {
+						return "", fmt.Errorf("removing domain: %w", err)
+					}
+					resp.Body.Close()
 
-		fmt.Printf("Domain %s removed.\n", domain)
-		return nil
+					if resp.StatusCode == http.StatusConflict {
+						fmt.Printf("\n  %s has an active tunnel. Removing it will disconnect the tunnel.\n", term.Bold.Render(domain))
+						if !term.ConfirmPrompt("  Continue?") {
+							return "", fmt.Errorf("cancelled")
+						}
+
+						req, err = http.NewRequest("DELETE", deleteURL+"?force=true", nil)
+						if err != nil {
+							return "", fmt.Errorf("creating request: %w", err)
+						}
+						req.Header.Set("Authorization", "Bearer "+info.Token)
+
+						resp, err = client.Do(req)
+						if err != nil {
+							return "", fmt.Errorf("removing domain: %w", err)
+						}
+						defer resp.Body.Close()
+					}
+
+					if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+						return "", apiError(resp, "failed to remove domain")
+					}
+
+					return "done", nil
+				},
+			},
+		})
 	},
 }
 

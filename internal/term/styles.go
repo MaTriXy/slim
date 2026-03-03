@@ -1,6 +1,13 @@
 package term
 
-import "charm.land/lipgloss/v2"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+
+	"charm.land/lipgloss/v2"
+)
 
 var (
 	Green   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(2))
@@ -15,6 +22,16 @@ var (
 	CrossMark = Red.Render("✗")
 	WarnMark  = Yellow.Render("!")
 )
+
+func ConfirmPrompt(msg string) bool {
+	fmt.Printf("%s [y/N] ", msg)
+	scanner := bufio.NewScanner(os.Stdin)
+	if !scanner.Scan() {
+		return false
+	}
+	answer := strings.TrimSpace(strings.ToLower(scanner.Text()))
+	return answer == "y" || answer == "yes"
+}
 
 func StyleForStatus(code int) lipgloss.Style {
 	switch {
