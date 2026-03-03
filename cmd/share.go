@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"os/signal"
 	"syscall"
@@ -29,7 +27,6 @@ var shareCmd = &cobra.Command{
 
   slim share --port 3000
   slim share --port 3000 --subdomain cool
-  slim share --port 3000 --password
   slim share --port 3000 --password secret
   slim share --port 3000 --ttl 30m`,
 	Args: cobra.NoArgs,
@@ -52,16 +49,7 @@ var shareCmd = &cobra.Command{
 
 		subdomain := shareName
 
-		password := ""
-		if sharePassword == "auto" {
-			b := make([]byte, 16)
-			if _, err := rand.Read(b); err != nil {
-				return fmt.Errorf("generating password: %w", err)
-			}
-			password = hex.EncodeToString(b)[:16]
-		} else if sharePassword != "" {
-			password = sharePassword
-		}
+		password := sharePassword
 
 		ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 		defer stop()
@@ -107,8 +95,7 @@ func init() {
 	shareCmd.Flags().IntVarP(&sharePort, "port", "p", 0, "Local port to expose")
 	_ = shareCmd.MarkFlagRequired("port")
 	shareCmd.Flags().StringVar(&shareName, "subdomain", "", "Vanity subdomain name")
-	shareCmd.Flags().StringVar(&sharePassword, "password", "", "Require password (omit value to auto-generate)")
-	shareCmd.Flags().Lookup("password").NoOptDefVal = "auto"
+	shareCmd.Flags().StringVar(&sharePassword, "password", "", "Require password for tunnel access")
 	shareCmd.Flags().DurationVar(&shareTTL, "ttl", 1*time.Hour, "Tunnel time-to-live (max 1h)")
 	rootCmd.AddCommand(shareCmd)
 }
