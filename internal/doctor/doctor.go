@@ -104,7 +104,7 @@ func checkPortForwarding() CheckResult {
 		return CheckResult{Name: name, Status: Warn, Message: "not configured"}
 	}
 	if daemonIsRunningFn() && !pf.IsLoaded() {
-		return CheckResult{Name: name, Status: Fail, Message: fmt.Sprintf("configured but rules not loaded (run: sudo pfctl -f /etc/pf.conf)")}
+		return CheckResult{Name: name, Status: Fail, Message: "configured but rules not loaded (run: sudo pfctl -f /etc/pf.conf)"}
 	}
 	return CheckResult{Name: name, Status: Pass, Message: fmt.Sprintf("active (80→%d, 443→%d)", config.ProxyHTTPPort, config.ProxyHTTPSPort)}
 }
