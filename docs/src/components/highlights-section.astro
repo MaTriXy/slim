@@ -56,20 +56,20 @@ import Folder from '../icons/folder.astro';
     </p>
     <div class="flex flex-col">
       <HowStep number="1">
-        <strong class="text-[13.5px] font-semibold text-text">Generates a root CA</strong>
-        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">and trusts it in macOS Keychain or Linux CA store.</span>
+        <strong class="text-[13.5px] font-semibold text-text">Creates a local development CA</strong>
+        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">so your <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs">.test</code> domains work over HTTPS without browser warnings.</span>
       </HowStep>
       <HowStep number="2">
-        <strong class="text-[13.5px] font-semibold text-text">Creates per-domain certificates</strong>
-        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">on demand, served via SNI for each <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs">.test</code> domain.</span>
+        <strong class="text-[13.5px] font-semibold text-text">Issues per-domain certificates</strong>
+        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">on the fly, signed by that CA for each mapped domain.</span>
       </HowStep>
       <HowStep number="3">
-        <strong class="text-[13.5px] font-semibold text-text">Manages <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs font-medium">/etc/hosts</code></strong>
-        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">entries automatically, pointing domains to <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs">127.0.0.1</code>.</span>
+        <strong class="text-[13.5px] font-semibold text-text">Updates <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs font-medium">/etc/hosts</code></strong>
+        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">automatically, pointing your domains to <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs">127.0.0.1</code>.</span>
       </HowStep>
       <HowStep number="4">
         <strong class="text-[13.5px] font-semibold text-text">Forwards ports 80/443</strong>
-        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">via <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs">pfctl</code> or <code class="bg-[hsl(0_0%_100%/8%)] px-[5px] py-px rounded-[3px] text-xs">iptables</code> so the proxy runs unprivileged.</span>
+        <span class="text-[13.5px] text-text-tertiary ml-0.5 max-sm:block max-sm:ml-0 max-sm:mt-0.5">so the proxy listens on standard ports without needing root.</span>
       </HowStep>
       <HowStep number="5">
         <strong class="text-[13.5px] font-semibold text-text">Reverse proxies requests</strong>
