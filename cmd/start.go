@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/kamranahmedse/slim/internal/proxy"
 	"github.com/kamranahmedse/slim/internal/setup"
 	"github.com/kamranahmedse/slim/internal/system"
+	"github.com/kamranahmedse/slim/internal/term"
 	"github.com/spf13/cobra"
 )
 
@@ -25,17 +27,20 @@ var startRoutes []string
 var startCmd = &cobra.Command{
 	Use:   "start [name] --port [port]",
 	Short: "Start proxying a domain",
-	Long: `Map a .test domain to a local port and start proxying.
+	Long: `Map a local domain to a port and start proxying.
 Runs first-time setup automatically if needed.
 
-  slim start myapp --port 3000
-  # https://myapp.test → localhost:3000`,
+  slim start myapp --port 3000        # https://myapp.test → localhost:3000
+  slim start app.loc --port 3000      # https://app.loc → localhost:3000`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := normalizeName(args[0])
 
 		if err := config.ValidateDomain(name, startPort); err != nil {
 			return err
+		}
+		if strings.HasSuffix(name, ".local") {
+			fmt.Fprintf(os.Stderr, "%s .local is reserved for mDNS and may cause slow DNS resolution on macOS/Linux\n", term.Yellow.Render("Warning:"))
 		}
 		if err := validateStartWaitFlags(cmd.Flags().Changed("timeout"), startWait, startWaitTimeout); err != nil {
 			return err

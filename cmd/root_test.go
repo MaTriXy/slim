@@ -7,12 +7,15 @@ func TestNormalizeName(t *testing.T) {
 		input string
 		want  string
 	}{
-		{input: "myapp", want: "myapp"},
-		{input: "myapp.test", want: "myapp"},
-		{input: "myapp.test.", want: "myapp"},
-		{input: "MYAPP.TEST", want: "myapp"},
-		{input: "  myapp.test  ", want: "myapp"},
-		{input: "my-app", want: "my-app"},
+		{input: "myapp", want: "myapp.test"},
+		{input: "myapp.test", want: "myapp.test"},
+		{input: "myapp.test.", want: "myapp.test"},
+		{input: "MYAPP.TEST", want: "myapp.test"},
+		{input: "  myapp.test  ", want: "myapp.test"},
+		{input: "my-app", want: "my-app.test"},
+		{input: "app.loc", want: "app.loc"},
+		{input: "APP.LOC", want: "app.loc"},
+		{input: "my.custom.domain", want: "my.custom.domain"},
 	}
 
 	for _, tt := range tests {

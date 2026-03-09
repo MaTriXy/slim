@@ -56,13 +56,12 @@ func GenerateLeafCert(name string) error {
 		return fmt.Errorf("generating serial: %w", err)
 	}
 
-	hostname := name + ".test"
 	template := &x509.Certificate{
 		SerialNumber: serial,
 		Subject: pkix.Name{
-			CommonName: hostname,
+			CommonName: name,
 		},
-		DNSNames:    []string{hostname},
+		DNSNames:    []string{name},
 		IPAddresses: []net.IP{net.ParseIP("127.0.0.1"), net.ParseIP("::1")},
 		NotBefore:   time.Now().Add(-1 * time.Hour),
 		NotAfter:    time.Now().Add(825 * 24 * time.Hour), // ~2 years, under Apple's limit

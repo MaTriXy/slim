@@ -56,7 +56,7 @@ var logsCmd = &cobra.Command{
 
 		filter := ""
 		if len(args) > 0 {
-			filter = normalizeName(args[0]) + ".test"
+			filter = normalizeName(args[0])
 		}
 
 		if logsFollow {

@@ -5,6 +5,66 @@ import (
 	"testing"
 )
 
+func TestNormalizeDomain(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"myapp", "myapp.test"},
+		{"api", "api.test"},
+		{"myapp.test", "myapp.test"},
+		{"app.loc", "app.loc"},
+		{"my.custom.domain", "my.custom.domain"},
+		{"app.local", "app.local"},
+		{"web.dev", "web.dev"},
+	}
+
+	for _, tt := range tests {
+		got := NormalizeDomain(tt.input)
+		if got != tt.want {
+			t.Errorf("NormalizeDomain(%q) = %q, want %q", tt.input, got, tt.want)
+		}
+	}
+}
+
+func TestLoadMigratesBareDomainNames(t *testing.T) {
+	baseDir = t.TempDir()
+
+	cfg := &Config{
+		Domains: []Domain{
+			{Name: "myapp", Port: 3000},
+			{Name: "api", Port: 8080},
+			{Name: "app.loc", Port: 9000},
+		},
+	}
+	if err := cfg.Save(); err != nil {
+		t.Fatalf("Save: %v", err)
+	}
+
+	loaded, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	if loaded.Domains[0].Name != "myapp.test" {
+		t.Errorf("expected myapp.test, got %q", loaded.Domains[0].Name)
+	}
+	if loaded.Domains[1].Name != "api.test" {
+		t.Errorf("expected api.test, got %q", loaded.Domains[1].Name)
+	}
+	if loaded.Domains[2].Name != "app.loc" {
+		t.Errorf("expected app.loc (unchanged), got %q", loaded.Domains[2].Name)
+	}
+
+	reloaded, err := Load()
+	if err != nil {
+		t.Fatalf("Load after migration: %v", err)
+	}
+	if reloaded.Domains[0].Name != "myapp.test" {
+		t.Errorf("expected persisted migration, got %q", reloaded.Domains[0].Name)
+	}
+}
+
 func TestValidateDomain(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -57,7 +117,7 @@ func TestConfigLifecycle(t *testing.T) {
 		t.Fatalf("expected 0 domains, got %d", len(cfg.Domains))
 	}
 
-	if err := cfg.SetDomain("myapp", 3000, nil); err != nil {
+	if err := cfg.SetDomain("myapp.test", 3000, nil); err != nil {
 		t.Fatalf("SetDomain: %v", err)
 	}
 
@@ -68,11 +128,11 @@ func TestConfigLifecycle(t *testing.T) {
 	if len(cfg.Domains) != 1 {
 		t.Fatalf("expected 1 domain, got %d", len(cfg.Domains))
 	}
-	if cfg.Domains[0].Name != "myapp" || cfg.Domains[0].Port != 3000 {
+	if cfg.Domains[0].Name != "myapp.test" || cfg.Domains[0].Port != 3000 {
 		t.Fatalf("unexpected domain: %+v", cfg.Domains[0])
 	}
 
-	d, idx := cfg.FindDomain("myapp")
+	d, idx := cfg.FindDomain("myapp.test")
 	if d == nil || idx != 0 {
 		t.Fatalf("FindDomain: got %v at %d", d, idx)
 	}
@@ -82,7 +142,7 @@ func TestConfigLifecycle(t *testing.T) {
 		t.Fatalf("FindDomain nonexistent: got %v at %d", d, idx)
 	}
 
-	if err := cfg.SetDomain("myapp", 4000, nil); err != nil {
+	if err := cfg.SetDomain("myapp.test", 4000, nil); err != nil {
 		t.Fatalf("SetDomain update: %v", err)
 	}
 	cfg, _ = Load()
@@ -90,7 +150,7 @@ func TestConfigLifecycle(t *testing.T) {
 		t.Fatalf("expected port 4000, got %d", cfg.Domains[0].Port)
 	}
 
-	if err := cfg.SetDomain("api", 8080, nil); err != nil {
+	if err := cfg.SetDomain("api.test", 8080, nil); err != nil {
 		t.Fatalf("SetDomain second: %v", err)
 	}
 	cfg, _ = Load()
@@ -98,11 +158,11 @@ func TestConfigLifecycle(t *testing.T) {
 		t.Fatalf("expected 2 domains, got %d", len(cfg.Domains))
 	}
 
-	if err := cfg.RemoveDomain("myapp"); err != nil {
+	if err := cfg.RemoveDomain("myapp.test"); err != nil {
 		t.Fatalf("RemoveDomain: %v", err)
 	}
 	cfg, _ = Load()
-	if len(cfg.Domains) != 1 || cfg.Domains[0].Name != "api" {
+	if len(cfg.Domains) != 1 || cfg.Domains[0].Name != "api.test" {
 		t.Fatalf("unexpected domains after remove: %+v", cfg.Domains)
 	}
 
@@ -177,7 +237,7 @@ func TestSetDomainWithRoutes(t *testing.T) {
 	}
 
 	routes := []Route{{Path: "/api", Port: 8080}}
-	if err := cfg.SetDomain("myapp", 3000, routes); err != nil {
+	if err := cfg.SetDomain("myapp.test", 3000, routes); err != nil {
 		t.Fatalf("SetDomain with routes: %v", err)
 	}
 
@@ -186,7 +246,7 @@ func TestSetDomainWithRoutes(t *testing.T) {
 		t.Fatalf("unexpected routes: %+v", cfg.Domains[0].Routes)
 	}
 
-	if err := cfg.SetDomain("myapp", 3000, nil); err != nil {
+	if err := cfg.SetDomain("myapp.test", 3000, nil); err != nil {
 		t.Fatalf("SetDomain clear routes: %v", err)
 	}
 

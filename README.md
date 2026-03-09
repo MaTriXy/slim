@@ -5,7 +5,7 @@
 <h1 align="center">Slim</h1>
 
 <p align="center">
-  Simple command to get a clean HTTPS <code>.test</code> for your local projects
+  Simple command to get clean HTTPS local domains for your projects
 </p>
 
 <p align="center">
@@ -18,6 +18,7 @@
 myapp.test        → localhost:3000
 myapp.test/api    → localhost:8080
 dashboard.test    → localhost:5173
+app.loc           → localhost:4000
 ```
 
 ## Install
@@ -44,6 +45,9 @@ Requires Go 1.25 or later to build from source.
 slim start myapp --port 3000
 
 # That's it. Open https://myapp.test
+
+# Or use any TLD you like
+slim start app.loc --port 4000
 ```
 
 Or define all services in a `.slim.yaml` project config and start them at once:
@@ -60,6 +64,9 @@ First run handles all setup automatically (CA generation, keychain trust, port f
 # Start proxying domains
 slim start myapp --port 3000
 slim start api --port 8080
+
+# Use a custom TLD
+slim start app.loc --port 4000
 
 # Route different paths to different upstream ports
 slim start myapp --port 3000 --route /api=8080 --route /ws=9000
@@ -118,6 +125,18 @@ slim start myapp --port 3000 --route /api=8080 --route /ws=9000
 
 Routes use longest-prefix matching — `/api/users` matches `/api` before `/`. The `--port` flag sets the default upstream for unmatched paths.
 
+### Custom TLDs
+
+By default, bare names like `myapp` get `.test` appended automatically. You can also use any TLD you want by specifying the full domain:
+
+```bash
+slim start app.loc --port 3000      # https://app.loc → localhost:3000
+slim start my.dev --port 4000       # https://my.dev → localhost:4000
+slim start a.b.c --port 5000        # https://a.b.c → localhost:5000
+```
+
+> **Note:** Avoid `.local` — it's reserved for mDNS and can cause slow DNS resolution on macOS/Linux.
+
 ### Project Config (`.slim.yaml`)
 
 Define all services for a project in a `.slim.yaml` file at the project root:
@@ -131,6 +150,8 @@ services:
         port: 8080
   - domain: dashboard
     port: 5173
+  - domain: app.loc
+    port: 4000
 log_mode: minimal
 ```
 

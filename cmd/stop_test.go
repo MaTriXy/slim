@@ -14,11 +14,11 @@ func TestStopOneDomainNotFound(t *testing.T) {
 	restore := setupStopTestHooks(t)
 	defer restore()
 
-	if err := seedDomains([]config.Domain{{Name: "api", Port: 8080}}); err != nil {
+	if err := seedDomains([]config.Domain{{Name: "api.test", Port: 8080}}); err != nil {
 		t.Fatalf("seedDomains: %v", err)
 	}
 
-	err := stopOne("myapp")
+	err := stopOne("myapp.test")
 	if err == nil {
 		t.Fatal("expected stopOne to fail for missing domain")
 	}
@@ -31,7 +31,7 @@ func TestStopOneSendsShutdownWhenLastDomain(t *testing.T) {
 	restore := setupStopTestHooks(t)
 	defer restore()
 
-	if err := seedDomains([]config.Domain{{Name: "myapp", Port: 3000}}); err != nil {
+	if err := seedDomains([]config.Domain{{Name: "myapp.test", Port: 3000}}); err != nil {
 		t.Fatalf("seedDomains: %v", err)
 	}
 
@@ -44,7 +44,7 @@ func TestStopOneSendsShutdownWhenLastDomain(t *testing.T) {
 		return &daemon.Response{OK: true}, nil
 	}
 
-	if err := stopOne("myapp"); err != nil {
+	if err := stopOne("myapp.test"); err != nil {
 		t.Fatalf("stopOne: %v", err)
 	}
 
@@ -66,8 +66,8 @@ func TestStopOneSendsReloadWhenDomainsRemain(t *testing.T) {
 	defer restore()
 
 	if err := seedDomains([]config.Domain{
-		{Name: "myapp", Port: 3000},
-		{Name: "api", Port: 8080},
+		{Name: "myapp.test", Port: 3000},
+		{Name: "api.test", Port: 8080},
 	}); err != nil {
 		t.Fatalf("seedDomains: %v", err)
 	}
@@ -81,7 +81,7 @@ func TestStopOneSendsReloadWhenDomainsRemain(t *testing.T) {
 		return &daemon.Response{OK: true}, nil
 	}
 
-	if err := stopOne("myapp"); err != nil {
+	if err := stopOne("myapp.test"); err != nil {
 		t.Fatalf("stopOne: %v", err)
 	}
 	if gotType != daemon.MsgReload {
@@ -92,7 +92,7 @@ func TestStopOneSendsReloadWhenDomainsRemain(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if len(cfg.Domains) != 1 || cfg.Domains[0].Name != "api" {
+	if len(cfg.Domains) != 1 || cfg.Domains[0].Name != "api.test" {
 		t.Fatalf("unexpected remaining domains: %+v", cfg.Domains)
 	}
 }
@@ -116,8 +116,8 @@ func TestStopAllRemovesHostsAndSendsShutdown(t *testing.T) {
 	defer restore()
 
 	if err := seedDomains([]config.Domain{
-		{Name: "myapp", Port: 3000},
-		{Name: "api", Port: 8080},
+		{Name: "myapp.test", Port: 3000},
+		{Name: "api.test", Port: 8080},
 	}); err != nil {
 		t.Fatalf("seedDomains: %v", err)
 	}
@@ -125,7 +125,7 @@ func TestStopAllRemovesHostsAndSendsShutdown(t *testing.T) {
 	removed := make([]string, 0, 2)
 	systemRemoveHostFn = func(name string) error {
 		removed = append(removed, name)
-		if name == "myapp" {
+		if name == "myapp.test" {
 			return errors.New("remove failed")
 		}
 		return nil
@@ -164,7 +164,7 @@ func TestStopAllDaemonShutdownError(t *testing.T) {
 	restore := setupStopTestHooks(t)
 	defer restore()
 
-	if err := seedDomains([]config.Domain{{Name: "myapp", Port: 3000}}); err != nil {
+	if err := seedDomains([]config.Domain{{Name: "myapp.test", Port: 3000}}); err != nil {
 		t.Fatalf("seedDomains: %v", err)
 	}
 

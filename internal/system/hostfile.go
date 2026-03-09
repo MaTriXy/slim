@@ -15,15 +15,14 @@ var (
 )
 
 func AddHost(name string) error {
-	hostname := name + ".test"
-	entry := fmt.Sprintf("127.0.0.1 %s %s", hostname, marker)
+	entry := fmt.Sprintf("127.0.0.1 %s %s", name, marker)
 
 	content, err := readFileHostFn(hostsPath)
 	if err != nil {
 		return fmt.Errorf("reading hosts file: %w", err)
 	}
 
-	if HasMarkedEntry(string(content), hostname) {
+	if HasMarkedEntry(string(content), name) {
 		return nil
 	}
 
@@ -32,8 +31,6 @@ func AddHost(name string) error {
 }
 
 func RemoveHost(name string) error {
-	hostname := name + ".test"
-
 	content, err := readFileHostFn(hostsPath)
 	if err != nil {
 		return fmt.Errorf("reading hosts file: %w", err)
@@ -42,7 +39,7 @@ func RemoveHost(name string) error {
 	lines := strings.Split(string(content), "\n")
 	var filtered []string
 	for _, line := range lines {
-		if lineHasHost(line, hostname) && strings.Contains(line, marker) {
+		if lineHasHost(line, name) && strings.Contains(line, marker) {
 			continue
 		}
 		filtered = append(filtered, line)

@@ -41,17 +41,17 @@ func TestDownRemovesProjectServices(t *testing.T) {
 	defer restore()
 
 	if err := seedDomains([]config.Domain{
-		{Name: "myapp", Port: 3000},
-		{Name: "api", Port: 8080},
-		{Name: "other", Port: 9000},
+		{Name: "myapp.test", Port: 3000},
+		{Name: "api.test", Port: 8080},
+		{Name: "other.test", Port: 9000},
 	}); err != nil {
 		t.Fatalf("seedDomains: %v", err)
 	}
 
 	pc := &project.ProjectConfig{
 		Services: []project.Service{
-			{Domain: "myapp", Port: 3000},
-			{Domain: "api", Port: 8080},
+			{Domain: "myapp.test", Port: 3000},
+			{Domain: "api.test", Port: 8080},
 		},
 	}
 
@@ -80,7 +80,7 @@ func TestDownRemovesProjectServices(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	if len(cfg.Domains) != 1 || cfg.Domains[0].Name != "other" {
+	if len(cfg.Domains) != 1 || cfg.Domains[0].Name != "other.test" {
 		t.Fatalf("expected only 'other' to remain, got %+v", cfg.Domains)
 	}
 }
@@ -90,14 +90,14 @@ func TestDownShutdownsWhenNoDomains(t *testing.T) {
 	defer restore()
 
 	if err := seedDomains([]config.Domain{
-		{Name: "myapp", Port: 3000},
+		{Name: "myapp.test", Port: 3000},
 	}); err != nil {
 		t.Fatalf("seedDomains: %v", err)
 	}
 
 	pc := &project.ProjectConfig{
 		Services: []project.Service{
-			{Domain: "myapp", Port: 3000},
+			{Domain: "myapp.test", Port: 3000},
 		},
 	}
 

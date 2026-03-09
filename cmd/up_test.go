@@ -57,8 +57,8 @@ func TestUpStartsDaemonForProjectServices(t *testing.T) {
 
 	pc := &project.ProjectConfig{
 		Services: []project.Service{
-			{Domain: "myapp", Port: 3000},
-			{Domain: "api", Port: 8080},
+			{Domain: "myapp.test", Port: 3000},
+			{Domain: "api.test", Port: 8080},
 		},
 	}
 
@@ -94,7 +94,7 @@ func TestUpReloadsDaemonWhenRunning(t *testing.T) {
 
 	pc := &project.ProjectConfig{
 		Services: []project.Service{
-			{Domain: "myapp", Port: 3000},
+			{Domain: "myapp.test", Port: 3000},
 		},
 	}
 
@@ -129,8 +129,8 @@ func TestUpValidationError(t *testing.T) {
 
 	pc := &project.ProjectConfig{
 		Services: []project.Service{
-			{Domain: "myapp", Port: 3000},
-			{Domain: "myapp", Port: 4000},
+			{Domain: "myapp.test", Port: 3000},
+			{Domain: "myapp.test", Port: 4000},
 		},
 	}
 

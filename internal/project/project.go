@@ -58,6 +58,11 @@ func Load(path string) (*ProjectConfig, error) {
 	if err := yaml.Unmarshal(data, &pc); err != nil {
 		return nil, fmt.Errorf("parsing %s: %w", path, err)
 	}
+
+	for i, svc := range pc.Services {
+		pc.Services[i].Domain = config.NormalizeDomain(svc.Domain)
+	}
+
 	return &pc, nil
 }
 

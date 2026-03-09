@@ -61,15 +61,11 @@ func (s *Server) getCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, e
 			return nil, fmt.Errorf("no domains configured")
 		}
 	} else {
-		var ok bool
-		name, ok = localDomainFromHost(hello.ServerName)
-		if !ok {
-			return nil, fmt.Errorf("unsupported server name %q", hello.ServerName)
-		}
+		name = normalizeHost(hello.ServerName)
 	}
 
 	if !s.isKnownDomain(name) {
-		return nil, fmt.Errorf("domain %s.test is not configured", name)
+		return nil, fmt.Errorf("domain %s is not configured", name)
 	}
 
 	if tlsCert := s.cachedCertificate(name); tlsCert != nil {
@@ -161,7 +157,7 @@ func (s *Server) Start() error {
 	s.cfgMu.RUnlock()
 
 	for _, d := range domains {
-		log.Info("  %s.test → localhost:%d", d.Name, d.Port)
+		log.Info("  %s → localhost:%d", d.Name, d.Port)
 		for _, r := range d.Routes {
 			log.Info("    %s → localhost:%d", r.Path, r.Port)
 		}

@@ -36,6 +36,13 @@ type Config struct {
 	Cors    bool     `yaml:"cors,omitempty"`
 }
 
+func NormalizeDomain(name string) string {
+	if !strings.Contains(name, ".") {
+		return name + ".test"
+	}
+	return name
+}
+
 func ValidateRoute(path string, port int) error {
 	if path == "" || path[0] != '/' {
 		return fmt.Errorf("route path must start with /")
@@ -116,6 +123,18 @@ func Load() (*Config, error) {
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("parsing config: %w", err)
 	}
+
+	migrated := false
+	for i, d := range cfg.Domains {
+		if normalized := NormalizeDomain(d.Name); normalized != d.Name {
+			cfg.Domains[i].Name = normalized
+			migrated = true
+		}
+	}
+	if migrated {
+		_ = cfg.Save()
+	}
+
 	return &cfg, nil
 }
 
@@ -154,7 +173,7 @@ func (c *Config) SetDomain(name string, port int, routes []Route) error {
 func (c *Config) RemoveDomain(name string) error {
 	_, idx := c.FindDomain(name)
 	if idx == -1 {
-		return fmt.Errorf("domain %s.test not found", name)
+		return fmt.Errorf("domain %s not found", name)
 	}
 	c.Domains = append(c.Domains[:idx], c.Domains[idx+1:]...)
 	return c.Save()

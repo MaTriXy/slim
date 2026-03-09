@@ -83,7 +83,7 @@ log_mode: minimal
 	if len(pc.Services) != 2 {
 		t.Fatalf("expected 2 services, got %d", len(pc.Services))
 	}
-	if pc.Services[0].Domain != "myapp" || pc.Services[0].Port != 3000 {
+	if pc.Services[0].Domain != "myapp.test" || pc.Services[0].Port != 3000 {
 		t.Fatalf("unexpected first service: %+v", pc.Services[0])
 	}
 	if len(pc.Services[0].Routes) != 1 || pc.Services[0].Routes[0].Path != "/api" {
@@ -95,6 +95,32 @@ log_mode: minimal
 
 	if err := pc.Validate(); err != nil {
 		t.Fatalf("Validate: %v", err)
+	}
+}
+
+func TestLoadNormalizesBareDomains(t *testing.T) {
+	tmpDir := t.TempDir()
+	path := filepath.Join(tmpDir, FileName)
+
+	content := `services:
+  - domain: myapp
+    port: 3000
+  - domain: app.loc
+    port: 4000
+`
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	pc, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if pc.Services[0].Domain != "myapp.test" {
+		t.Errorf("expected bare domain normalized to myapp.test, got %q", pc.Services[0].Domain)
+	}
+	if pc.Services[1].Domain != "app.loc" {
+		t.Errorf("expected custom TLD preserved as app.loc, got %q", pc.Services[1].Domain)
 	}
 }
 

@@ -22,15 +22,15 @@ func TestApplyConfigBuildsRoutesAndDefaults(t *testing.T) {
 	s := NewServer(&config.Config{})
 	cfg := &config.Config{
 		Domains: []config.Domain{
-			{Name: "myapp", Port: 3000},
-			{Name: "api", Port: 8080},
+			{Name: "myapp.test", Port: 3000},
+			{Name: "api.test", Port: 8080},
 		},
 	}
 
 	if err := s.applyConfig(cfg); err != nil {
 		t.Fatalf("applyConfig: %v", err)
 	}
-	if s.defaultDomain != "myapp" {
+	if s.defaultDomain != "myapp.test" {
 		t.Fatalf("expected default domain myapp, got %q", s.defaultDomain)
 	}
 	if len(s.routes) != 2 || len(s.knownDomains) != 2 || len(s.certCache) != 2 {
@@ -46,7 +46,7 @@ func TestApplyConfigPropagatesEnsureError(t *testing.T) {
 	loadLeafTLSFn = func(string) (*tls.Certificate, error) { return &tls.Certificate{}, nil }
 
 	s := NewServer(&config.Config{})
-	err := s.applyConfig(&config.Config{Domains: []config.Domain{{Name: "myapp", Port: 3000}}})
+	err := s.applyConfig(&config.Config{Domains: []config.Domain{{Name: "myapp.test", Port: 3000}}})
 	if err == nil {
 		t.Fatal("expected applyConfig to fail when ensureLeafCert fails")
 	}
@@ -63,7 +63,7 @@ func TestApplyConfigPropagatesLoadError(t *testing.T) {
 	loadLeafTLSFn = func(string) (*tls.Certificate, error) { return nil, errors.New("load failed") }
 
 	s := NewServer(&config.Config{})
-	err := s.applyConfig(&config.Config{Domains: []config.Domain{{Name: "myapp", Port: 3000}}})
+	err := s.applyConfig(&config.Config{Domains: []config.Domain{{Name: "myapp.test", Port: 3000}}})
 	if err == nil {
 		t.Fatal("expected applyConfig to fail when loadLeafTLS fails")
 	}
@@ -80,7 +80,7 @@ func TestReloadConfigLoadsFromDisk(t *testing.T) {
 	ensureLeafCertFn = func(string) error { return nil }
 	loadLeafTLSFn = func(string) (*tls.Certificate, error) { return &tls.Certificate{}, nil }
 
-	fileCfg := &config.Config{Domains: []config.Domain{{Name: "myapp", Port: 3000}}}
+	fileCfg := &config.Config{Domains: []config.Domain{{Name: "myapp.test", Port: 3000}}}
 	if err := fileCfg.Save(); err != nil {
 		t.Fatalf("Save config: %v", err)
 	}
@@ -90,10 +90,10 @@ func TestReloadConfigLoadsFromDisk(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ReloadConfig: %v", err)
 	}
-	if len(loaded.Domains) != 1 || loaded.Domains[0].Name != "myapp" {
+	if len(loaded.Domains) != 1 || loaded.Domains[0].Name != "myapp.test" {
 		t.Fatalf("unexpected loaded config: %+v", loaded.Domains)
 	}
-	if !s.isKnownDomain("myapp") {
+	if !s.isKnownDomain("myapp.test") {
 		t.Fatalf("expected myapp to be known after reload")
 	}
 }

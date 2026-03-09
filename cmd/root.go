@@ -14,15 +14,16 @@ var Version = "0.0.1"
 
 var rootCmd = &cobra.Command{
 	Use:   "slim",
-	Short: "Map custom .test domains to local dev server ports",
-	Long: `slim maps custom .test domains to local dev server ports with HTTPS
+	Short: "Map custom local domains to dev server ports",
+	Long: `slim maps custom local domains to dev server ports with HTTPS
 and WebSocket passthrough for HMR.
 
-  slim start myapp --port 3000    # start proxying
-  slim start api --port 8080      # add another domain
-  slim list                       # see what's running
-  slim stop myapp                 # stop one domain
-  slim stop                       # stop everything`,
+  slim start myapp --port 3000       # myapp.test → localhost:3000
+  slim start app.loc --port 3000     # app.loc → localhost:3000
+  slim start api --port 8080         # add another domain
+  slim list                          # see what's running
+  slim stop myapp                    # stop one domain
+  slim stop                          # stop everything`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		cmd.SilenceUsage = true
 	},
@@ -60,14 +61,13 @@ func init() {
 func normalizeName(input string) string {
 	input = strings.ToLower(strings.TrimSpace(input))
 	input = strings.TrimSuffix(input, ".")
-	input = strings.TrimSuffix(input, ".test")
-	return strings.TrimSuffix(input, ".")
+	return config.NormalizeDomain(input)
 }
 
 func printServices(domains []config.Domain) {
 	maxLen := 0
 	for _, d := range domains {
-		u := len("https://") + len(d.Name) + len(".test")
+		u := len("https://") + len(d.Name)
 		if u > maxLen {
 			maxLen = u
 		}
@@ -81,7 +81,7 @@ func printServices(domains []config.Domain) {
 	arrow := term.Dim.Render("→")
 
 	for _, d := range domains {
-		url := fmt.Sprintf("https://%s.test", d.Name)
+		url := "https://" + d.Name
 		fmt.Printf("%s %s  %s  %s\n",
 			term.CheckMark, term.Green.Render(fmt.Sprintf("%-*s", maxLen, url)),
 			arrow, term.Dim.Render(fmt.Sprintf("localhost:%d", d.Port)))

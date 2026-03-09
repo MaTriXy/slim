@@ -140,15 +140,14 @@ func missingIngressPorts() []string {
 }
 
 func checkHostsFile(domain string) CheckResult {
-	hostname := domain + ".test"
-	name := "Hosts: " + hostname
+	name := "Hosts: " + domain
 
 	content, err := readFileFn("/etc/hosts")
 	if err != nil {
 		return CheckResult{Name: name, Status: Fail, Message: "cannot read /etc/hosts"}
 	}
 
-	if system.HasMarkedEntry(string(content), hostname) {
+	if system.HasMarkedEntry(string(content), domain) {
 		return CheckResult{Name: name, Status: Pass, Message: "present in /etc/hosts"}
 	}
 	return CheckResult{Name: name, Status: Fail, Message: "missing from /etc/hosts"}
@@ -169,7 +168,7 @@ func checkDaemon() CheckResult {
 }
 
 func checkLeafCert(domain string) CheckResult {
-	name := "Cert: " + domain + ".test"
+	name := "Cert: " + domain
 
 	data, err := readFileFn(cert.LeafCertPath(domain))
 	if err != nil {

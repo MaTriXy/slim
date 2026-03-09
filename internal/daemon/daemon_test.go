@@ -39,8 +39,8 @@ func TestHandleStatusIncludesDomainHealth(t *testing.T) {
 
 	cfg := &config.Config{
 		Domains: []config.Domain{
-			{Name: "healthy", Port: healthyPort},
-			{Name: "unhealthy", Port: unhealthyPort},
+			{Name: "healthy.test", Port: healthyPort},
+			{Name: "unhealthy.test", Port: unhealthyPort},
 		},
 	}
 	if err := cfg.Save(); err != nil {
@@ -68,10 +68,10 @@ func TestHandleStatusIncludesDomainHealth(t *testing.T) {
 		healthByName[d.Name] = d.Healthy
 	}
 
-	if !healthByName["healthy"] {
+	if !healthByName["healthy.test"] {
 		t.Fatalf("expected healthy domain to be reachable, got %+v", status.Domains)
 	}
-	if healthByName["unhealthy"] {
+	if healthByName["unhealthy.test"] {
 		t.Fatalf("expected unhealthy domain to be unreachable, got %+v", status.Domains)
 	}
 }
