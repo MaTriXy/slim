@@ -139,6 +139,10 @@ $ slim doctor
   ✓  Cert: myapp.test     valid, expires 2027-06-03
 ```
 
+## Updating
+
+Run `slim update` to update to latest version.
+
 ## Uninstall
 
 > Remove everything: CA, certs, hosts entries, port-forward rules, config
