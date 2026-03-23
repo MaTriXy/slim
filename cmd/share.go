@@ -43,6 +43,10 @@ var shareCmd = &cobra.Command{
 			return fmt.Errorf("cannot use --subdomain and --domain together")
 		}
 
+		if err := tunnel.ValidateSubdomain(shareName); err != nil {
+			return err
+		}
+
 		info, err := auth.Require()
 		if err != nil {
 			return err
