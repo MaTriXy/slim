@@ -63,11 +63,11 @@
     max-width: 100%;
   }
 
-  main section {
+  main.home section {
     position: relative;
   }
 
-  main section::before {
+  main.home section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -78,7 +78,7 @@
     background: var(--color-border);
   }
 
-  main section#install::before {
+  main.home section#install::before {
     display: none;
   }
 }

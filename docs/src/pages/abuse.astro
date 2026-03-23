@@ -1,0 +1,50 @@
+---
+import SiteHeader from '../components/site-header.astro';
+import SiteFooter from '../components/site-footer.astro';
+import Layout from '../layouts/layout.astro';
+---
+
+<Layout title="Report Abuse — Slim" description="Report abuse or misuse of slim.show tunnels.">
+  <SiteHeader />
+  <main class="max-w-(--max-width) mx-auto px-(--padding-x) py-16 min-h-[70vh]">
+    <div class="max-w-xl mx-auto">
+      <h1 class="text-2xl font-bold text-text mb-2">Report Abuse</h1>
+      <p class="text-text-secondary text-[15px] leading-relaxed mb-8">
+        If you've encountered a <strong>slim.show</strong> tunnel being used for phishing, malware distribution, or any other malicious activity, please report it below. We take abuse seriously and will investigate promptly.
+      </p>
+
+      <div class="space-y-6">
+        <section>
+          <h2 class="text-base font-semibold text-text mb-2">Email</h2>
+          <p class="text-text-secondary text-sm leading-relaxed">
+            Send abuse reports to <a href="mailto:abuse@slim.sh" class="text-text underline underline-offset-2 hover:text-white">abuse@slim.sh</a> with the following details:
+          </p>
+          <ul class="mt-3 space-y-1.5 text-sm text-text-secondary list-disc pl-5">
+            <li>The full URL (e.g. <code class="text-text-tertiary bg-surface px-1.5 py-0.5 rounded text-xs">https://example.slim.show</code>)</li>
+            <li>Description of the abusive content or behavior</li>
+            <li>Screenshots if available</li>
+            <li>Date and time you encountered it</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-text mb-2">What we do</h2>
+          <ul class="space-y-1.5 text-sm text-text-secondary list-disc pl-5">
+            <li>Investigate all reports within 24 hours</li>
+            <li>Immediately terminate tunnels confirmed to be abusive</li>
+            <li>Ban accounts engaged in malicious activity</li>
+            <li>Cooperate with law enforcement when required</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-base font-semibold text-text mb-2">What is slim.show?</h2>
+          <p class="text-text-secondary text-sm leading-relaxed">
+            <strong class="text-text">slim.show</strong> is a tunnel service by <a href="https://slim.sh" class="text-text underline underline-offset-2 hover:text-white">slim</a> that lets developers share their local development servers via temporary public URLs. Each <code class="text-text-tertiary bg-surface px-1.5 py-0.5 rounded text-xs">*.slim.show</code> subdomain is a user-generated tunnel that exists only while the developer's session is active.
+          </p>
+        </section>
+      </div>
+    </div>
+  </main>
+  <SiteFooter />
+</Layout>
