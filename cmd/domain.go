@@ -19,12 +19,10 @@ import (
 )
 
 type domainEntry struct {
-	ID         string `json:"id"`
-	Domain     string `json:"domain"`
-	Verified   bool   `json:"verified"`
-	TargetIP   string `json:"target_ip"`
-	CreatedAt  string `json:"created_at"`
-	VerifiedAt string `json:"verified_at,omitempty"`
+	ID        string `json:"id"`
+	Domain    string `json:"domain"`
+	Status    string `json:"status"`
+	CreatedAt string `json:"created_at"`
 }
 
 var domainCmd = &cobra.Command{
@@ -81,9 +79,6 @@ var domainAddCmd = &cobra.Command{
 					}
 
 					targetIP = result.TargetIP
-					if targetIP == "" {
-						targetIP = result.Domain.TargetIP
-					}
 
 					return "done", nil
 				},
@@ -141,9 +136,14 @@ var domainListCmd = &cobra.Command{
 
 		var rows [][]string
 		for _, d := range domains {
-			status := term.Yellow.Render("● pending")
-			if d.Verified {
-				status = term.Green.Render("● verified")
+			var status string
+			switch d.Status {
+			case "active":
+				status = term.Green.Render("● active")
+			case "issuing_cert":
+				status = term.Cyan.Render("● generating cert")
+			default:
+				status = term.Yellow.Render("● pending")
 			}
 			added := d.CreatedAt
 			if t, err := time.Parse(time.RFC3339, d.CreatedAt); err == nil {
